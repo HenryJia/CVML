@@ -33,7 +33,7 @@
       <ResourceCompiler Options=""/>
     </GlobalSettings>
     <Configuration Name="Debug" CompilerType="GCC" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-g;-O0;-std=c++11;-Wall;-I /usr/include/eigen3/;-I /usr/include/lapackpp;-I /usr/include/armadillo_bits/;" C_Options="-g;-O0;-std=c++11;-Wall;-I /usr/include/eigen3/;-I /usr/include/lapackpp;-I /usr/include/armadillo_bits/;" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+      <Compiler Options="-g;-O0;-std=c++11;-Wall;-I /usr/include/eigen3/;-I /usr/include/lapackpp;-I /usr/include/armadillo_bits/;-I /usr/include/opencv/;" C_Options="-g;-O0;-std=c++11;-Wall;-I /usr/include/eigen3/;-I /usr/include/lapackpp;-I /usr/include/armadillo_bits/;-I /usr/include/opencv/" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
       </Compiler>
       <Linker Options="" Required="yes">
@@ -41,6 +41,28 @@
         <Library Value="gfortran"/>
         <Library Value="blas"/>
         <Library Value="armadillo"/>
+        <Library Value="opencv_core"/>
+        <Library Value="opencv_features2d"/>
+        <Library Value="opencv_flann"/>
+        <Library Value="opencv_gpu"/>
+        <Library Value="opencv_highgui"/>
+        <Library Value="opencv_imgproc"/>
+        <Library Value="opencv_legacy"/>
+        <Library Value="opencv_ml"/>
+        <Library Value="opencv_nonfree"/>
+        <Library Value="opencv_objdetect"/>
+        <Library Value="opencv_ocl"/>
+        <Library Value="opencv_photo"/>
+        <Library Value="opencv_stitching"/>
+        <Library Value="opencv_superres"/>
+        <Library Value="opencv_ts"/>
+        <Library Value="opencv_video"/>
+        <Library Value="opencv_videostab"/>
+        <Library Value="tbb"/>
+        <Library Value="rt"/>
+        <Library Value="pthread"/>
+        <Library Value="m"/>
+        <Library Value="dl"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>

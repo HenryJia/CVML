@@ -39,8 +39,8 @@ LinkOptions            :=
 IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). 
 IncludePCH             := 
 RcIncludePath          := 
-Libs                   := $(LibrarySwitch)lapackpp $(LibrarySwitch)gfortran $(LibrarySwitch)blas $(LibrarySwitch)armadillo 
-ArLibs                 :=  "lapackpp" "gfortran" "blas" "armadillo" 
+Libs                   := $(LibrarySwitch)lapackpp $(LibrarySwitch)gfortran $(LibrarySwitch)blas $(LibrarySwitch)armadillo $(LibrarySwitch)opencv_core $(LibrarySwitch)opencv_features2d $(LibrarySwitch)opencv_flann $(LibrarySwitch)opencv_gpu $(LibrarySwitch)opencv_highgui $(LibrarySwitch)opencv_imgproc $(LibrarySwitch)opencv_legacy $(LibrarySwitch)opencv_ml $(LibrarySwitch)opencv_nonfree $(LibrarySwitch)opencv_objdetect $(LibrarySwitch)opencv_ocl $(LibrarySwitch)opencv_photo $(LibrarySwitch)opencv_stitching $(LibrarySwitch)opencv_superres $(LibrarySwitch)opencv_ts $(LibrarySwitch)opencv_video $(LibrarySwitch)opencv_videostab $(LibrarySwitch)tbb $(LibrarySwitch)rt $(LibrarySwitch)pthread $(LibrarySwitch)m $(LibrarySwitch)dl 
+ArLibs                 :=  "lapackpp" "gfortran" "blas" "armadillo" "opencv_core" "opencv_features2d" "opencv_flann" "opencv_gpu" "opencv_highgui" "opencv_imgproc" "opencv_legacy" "opencv_ml" "opencv_nonfree" "opencv_objdetect" "opencv_ocl" "opencv_photo" "opencv_stitching" "opencv_superres" "opencv_ts" "opencv_video" "opencv_videostab" "tbb" "rt" "pthread" "m" "dl" 
 LibPath                := $(LibraryPathSwitch). 
 
 ##
@@ -50,8 +50,8 @@ LibPath                := $(LibraryPathSwitch).
 AR       := /usr/bin/ar rcu
 CXX      := /usr/bin/g++
 CC       := /usr/bin/gcc
-CXXFLAGS :=  -g -O0 -std=c++11 -Wall -I /usr/include/eigen3/ -I /usr/include/lapackpp -I /usr/include/armadillo_bits/  $(Preprocessors)
-CFLAGS   :=  -g -O0 -std=c++11 -Wall -I /usr/include/eigen3/ -I /usr/include/lapackpp -I /usr/include/armadillo_bits/  $(Preprocessors)
+CXXFLAGS :=  -g -O0 -std=c++11 -Wall -I /usr/include/eigen3/ -I /usr/include/lapackpp -I /usr/include/armadillo_bits/ -I /usr/include/opencv/  $(Preprocessors)
+CFLAGS   :=  -g -O0 -std=c++11 -Wall -I /usr/include/eigen3/ -I /usr/include/lapackpp -I /usr/include/armadillo_bits/ -I /usr/include/opencv/ $(Preprocessors)
 ASFLAGS  := 
 AS       := /usr/bin/as
 
