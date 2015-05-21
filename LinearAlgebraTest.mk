@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=
-Date                   :=18/05/15
+Date                   :=21/05/15
 CodeLitePath           :="/home/henry/.codelite"
 LinkerName             :=/usr/bin/g++
 SharedObjectLinkerName :=/usr/bin/g++ -shared -fPIC
@@ -39,8 +39,8 @@ LinkOptions            :=
 IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). 
 IncludePCH             := 
 RcIncludePath          := 
-Libs                   := $(LibrarySwitch)lapackpp $(LibrarySwitch)gfortran $(LibrarySwitch)blas 
-ArLibs                 :=  "lapackpp" "gfortran" "blas" 
+Libs                   := $(LibrarySwitch)lapackpp $(LibrarySwitch)gfortran $(LibrarySwitch)blas $(LibrarySwitch)armadillo 
+ArLibs                 :=  "lapackpp" "gfortran" "blas" "armadillo" 
 LibPath                := $(LibraryPathSwitch). 
 
 ##
@@ -50,8 +50,8 @@ LibPath                := $(LibraryPathSwitch).
 AR       := /usr/bin/ar rcu
 CXX      := /usr/bin/g++
 CC       := /usr/bin/gcc
-CXXFLAGS :=  -g -O0 -std=c++11 -Wall -I /usr/include/eigen3/ -I /usr/include/lapackpp  $(Preprocessors)
-CFLAGS   :=  -g -O0 -std=c++11 -Wall -I /usr/include/eigen3/ -I /usr/include/lapackpp  $(Preprocessors)
+CXXFLAGS :=  -g -O0 -std=c++11 -Wall -I /usr/include/eigen3/ -I /usr/include/lapackpp -I /usr/include/armadillo_bits/  $(Preprocessors)
+CFLAGS   :=  -g -O0 -std=c++11 -Wall -I /usr/include/eigen3/ -I /usr/include/lapackpp -I /usr/include/armadillo_bits/  $(Preprocessors)
 ASFLAGS  := 
 AS       := /usr/bin/as
 

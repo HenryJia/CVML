@@ -2,9 +2,11 @@
 #include <Eigen/Dense>
 #include <chrono>
 #include <lapackpp.h>
+#include <armadillo>
 
 using namespace Eigen;
 using namespace std;
+using namespace arma;
 
 double testEigen()
 {
@@ -30,11 +32,25 @@ double testLapack()
 	return chrono::duration <double> (elapsed).count();
 }
 
+double testArmadillo()
+{
+	auto start = chrono::steady_clock::now();
+	mat a = randu<mat>(300000, 80);
+	mat b = randu<mat>(80, 30);
+	mat c = a * b;
+	auto end = chrono::steady_clock::now();
+	auto elapsed = end - start;
+	return chrono::duration <double> (elapsed).count();
+}
+
 int main()
 {
 	cout << "Eigen Start" << endl;
 	cout << testEigen() << " s" << endl;
 	cout << "Lapack Start" << endl;
 	cout << testLapack() << " s" << endl;
+	cout << "Armadillo Start" << endl;
+	cout << testArmadillo() << " s" << endl;
+	cout << "Finished, press enter to end" << endl;
 	getchar();
 }
