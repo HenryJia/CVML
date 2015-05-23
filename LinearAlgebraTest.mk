@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=
-Date                   :=21/05/15
+Date                   :=23/05/15
 CodeLitePath           :="/home/henry/.codelite"
 LinkerName             :=/usr/bin/g++
 SharedObjectLinkerName :=/usr/bin/g++ -shared -fPIC
@@ -60,7 +60,7 @@ AS       := /usr/bin/as
 ## User defined environment variables
 ##
 CodeLiteDir:=/usr/share/codelite
-Objects0=$(IntermediateDirectory)/main.cpp$(ObjectSuffix) 
+Objects0=$(IntermediateDirectory)/main.cpp$(ObjectSuffix) $(IntermediateDirectory)/datatools.cpp$(ObjectSuffix) 
 
 
 
@@ -94,6 +94,14 @@ $(IntermediateDirectory)/main.cpp$(DependSuffix): main.cpp
 
 $(IntermediateDirectory)/main.cpp$(PreprocessSuffix): main.cpp
 	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/main.cpp$(PreprocessSuffix) "main.cpp"
+
+$(IntermediateDirectory)/datatools.cpp$(ObjectSuffix): datatools.cpp $(IntermediateDirectory)/datatools.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/henry/Coding/C++/LinearAlgebraTest/datatools.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/datatools.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/datatools.cpp$(DependSuffix): datatools.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/datatools.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/datatools.cpp$(DependSuffix) -MM "datatools.cpp"
+
+$(IntermediateDirectory)/datatools.cpp$(PreprocessSuffix): datatools.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/datatools.cpp$(PreprocessSuffix) "datatools.cpp"
 
 
 -include $(IntermediateDirectory)/*$(DependSuffix)

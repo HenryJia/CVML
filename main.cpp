@@ -4,6 +4,10 @@
 #include <lapackpp.h>
 #include <armadillo>
 #include <opencv2/opencv.hpp>
+#include <fstream>
+#include <iomanip>
+
+#include "datatools.h"
 
 using namespace Eigen;
 using namespace std;
@@ -61,6 +65,7 @@ double testOpenCV()
 
 int main()
 {
+	cout << "Matrix Multiplication Tests" << endl;
 	cout << "Eigen Start" << endl;
 	cout << testEigen() << " s" << endl;
 	cout << "Lapack Start" << endl;
@@ -69,6 +74,11 @@ int main()
 	cout << testArmadillo() << " s" << endl;
 	cout << "OpenCV Start" << endl;
 	cout << testOpenCV() << " s" << endl;
+	cout << "Gradient Descent Tests" << endl;
+	cout << "Read CSV" << endl;
+	double csvTime;
+	vector<vector<double>> x = readCSV("trainP7_1.csv", false, csvTime);
+	cout << csvTime << " s" << endl;
 	cout << "Finished, press enter to end" << endl;
 	getchar();
 }
