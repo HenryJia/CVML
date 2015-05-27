@@ -23,6 +23,8 @@
     <File Name="main.cpp"/>
     <File Name="datatools.cpp"/>
     <File Name="datatools.h"/>
+    <File Name="cvnn.h"/>
+    <File Name="cvnn.cpp"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>

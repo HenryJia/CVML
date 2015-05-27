@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=
-Date                   :=23/05/15
+Date                   :=27/05/15
 CodeLitePath           :="/home/henry/.codelite"
 LinkerName             :=/usr/bin/g++
 SharedObjectLinkerName :=/usr/bin/g++ -shared -fPIC
@@ -60,7 +60,7 @@ AS       := /usr/bin/as
 ## User defined environment variables
 ##
 CodeLiteDir:=/usr/share/codelite
-Objects0=$(IntermediateDirectory)/main.cpp$(ObjectSuffix) $(IntermediateDirectory)/datatools.cpp$(ObjectSuffix) 
+Objects0=$(IntermediateDirectory)/main.cpp$(ObjectSuffix) $(IntermediateDirectory)/datatools.cpp$(ObjectSuffix) $(IntermediateDirectory)/cvnn.cpp$(ObjectSuffix) 
 
 
 
@@ -102,6 +102,14 @@ $(IntermediateDirectory)/datatools.cpp$(DependSuffix): datatools.cpp
 
 $(IntermediateDirectory)/datatools.cpp$(PreprocessSuffix): datatools.cpp
 	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/datatools.cpp$(PreprocessSuffix) "datatools.cpp"
+
+$(IntermediateDirectory)/cvnn.cpp$(ObjectSuffix): cvnn.cpp $(IntermediateDirectory)/cvnn.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/henry/Coding/C++/LinearAlgebraTest/cvnn.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/cvnn.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/cvnn.cpp$(DependSuffix): cvnn.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/cvnn.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/cvnn.cpp$(DependSuffix) -MM "cvnn.cpp"
+
+$(IntermediateDirectory)/cvnn.cpp$(PreprocessSuffix): cvnn.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/cvnn.cpp$(PreprocessSuffix) "cvnn.cpp"
 
 
 -include $(IntermediateDirectory)/*$(DependSuffix)

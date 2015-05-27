@@ -176,7 +176,7 @@ Debug/main.cpp.o: main.cpp /usr/include/eigen3/Eigen/Dense \
  /usr/include/lapackpp/blas1pp.h /usr/include/lapackpp/blas1.h \
  /usr/include/lapackpp/laversion.h /usr/include/lapackpp/blas2pp.h \
  /usr/include/lapackpp/blas2.h /usr/include/lapackpp/blas3pp.h \
- datatools.h
+ datatools.h cvnn.h
 
 /usr/include/eigen3/Eigen/Dense:
 
@@ -589,3 +589,5 @@ Debug/main.cpp.o: main.cpp /usr/include/eigen3/Eigen/Dense \
 /usr/include/lapackpp/blas3pp.h:
 
 datatools.h:
+
+cvnn.h:
