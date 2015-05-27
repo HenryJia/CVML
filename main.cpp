@@ -72,8 +72,6 @@ double testOpenCVNN(cv::Mat x, cv::Mat y, vector<double> &J, double alpha = 0.01
 	cv::Mat theta2 = randInitialiseWeights(40, 160);
 	cv::Mat theta3 = randInitialiseWeights(160, 1);
 
-	cout << "Theta3 Initial: " << theta3.rowRange(0, 10) << endl;
-
 	cv::Mat trans;
 	cv::Mat product;
 
