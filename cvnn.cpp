@@ -45,6 +45,9 @@ void cvnn::setData(vector<vector<double>> xVec, vector<vector<double>> yVec)
 {
 	x = vector2dToMat(xVec);
 	y = vector2dToMat(yVec);
+	int m = x.size().height;
+	if(sum(x.col(0) == Mat(m, 1, CV_64F, 1))[0] != x.rows * 255)
+		hconcat(Mat(m, 1, CV_64F, 1), x, x);
 }
 
 vector<vector<double>> cvnn::readCSV(string fileName, bool header, double &time)
@@ -100,9 +103,54 @@ void cvnn::forwardPropagate(size_t threadNum, int rangeLower, int rangeUpper)
 	a[base + layerNum - 2] = z[base + layerNum - 2];
 }
 
+void cvnn::smallDelta(size_t threadNum, int rangeLower, int rangeUpper)
+{
+	Mat data = x.rowRange(rangeLower, rangeUpper);
+	Mat datay = y.rowRange(rangeLower, rangeUpper);
+	size_t base = threadNum * (layerNum - 1);
+
+	Mat trans;
+	Mat product;
+
+	z[base] = data * theta[0];
+	a[base] = sigmoid(z[base]);
+	
+	for(size_t i = 1; i < layerNum - 2; i++)
+	{
+		hconcat(Mat(a[base + i - 1].size().height, 1, CV_64F, 1), a[base + i - 1], a[base + i - 1]);
+		z[base + i] = a[base + i - 1] * theta[i];
+		a[base + i] = sigmoid(z[base + i]);
+	}
+	
+	hconcat(Mat(a[base + layerNum - 3].size().height, 1, CV_64F, 1), a[base + layerNum - 3], a[base + layerNum - 3]);
+	z[base + layerNum - 2] = a[base + layerNum - 3] * theta[layerNum - 2];
+	a[base + layerNum - 2] = z[base + layerNum - 2];
+
+	delta[base + layerNum - 2] = a[base + layerNum - 2] - datay;
+
+	for(int i = layerNum - 3; i >= 0; i--)
+	{
+		transpose(theta[i + 1], trans);
+		product = delta[base + i + 1] * trans;
+		delta[base + i] = product.colRange(1, product.cols).mul(sigmoidGradient(z[base + i]));
+	}
+}
+
 double cvnn::trainConcurrentFuncApprox()
 {
 	auto start = chrono::steady_clock::now();
+
+	Mat concatA;
+	Mat concatZ;
+	Mat concatdelta;
+	Mat trans;
+
+	vector<Mat> zFinal;
+	vector<Mat> aFinal;
+
+	vector<Mat> deltaFinal;
+	vector<Mat> DeltaFinal;
+	vector<Mat> thetaGradFinal;
 
 	int m = x.size().height;
 
@@ -124,10 +172,6 @@ double cvnn::trainConcurrentFuncApprox()
 
 	t.resize(threads);
 
-	cv::MatExpr e = (x.col(0) == Mat(m, 1, CV_64F, 1));
-	if(sum(e)[0] != x.rows * 255)
-		hconcat(Mat(m, 1, CV_64F, 1), x, x);
-
 	int batch = m / threads;
 	int lowerRanges[threads];
 	int upperRanges[threads];
@@ -141,25 +185,28 @@ double cvnn::trainConcurrentFuncApprox()
 	for(int i = 0; i < iters; i++)
 	{
 		for(size_t j = 0; j < threads; j++)
-			t[j] = thread(&cvnn::forwardPropagate, this, j, lowerRanges[j], upperRanges[j]);
+			t[j] = thread(&cvnn::smallDelta, this, j, lowerRanges[j], upperRanges[j]);
 		for(size_t j = 0; j < threads; j++)
 			if(t[j].joinable())
 				t[j].join();
-		/*for(size_t j = 0; j < threads; j++)
-			forwardPropagate(j, lowerRanges[j], upperRanges[j]);*/
+		//for(size_t j = 0; j < threads; j++)
+		//	smallDelta(j, lowerRanges[j], upperRanges[j]);
 		for(size_t j = 0; j < layerNum - 1; j++)
 		{
 			concatA = a[j];
 			concatZ = z[j];
+			concatdelta = delta[j];
 			for(size_t k = 1; k < threads; k++)
 			{
 				vconcat(concatA, a[k * (layerNum - 1) + j], concatA);
 				vconcat(concatZ, z[k * (layerNum - 1) + j], concatZ);
+				vconcat(concatdelta, delta[k * (layerNum - 1) + j], concatdelta);
 			}
 			aFinal[j] = concatA;
 			zFinal[j] = concatZ;
+			deltaFinal[j] = concatdelta;
 		}
-		//Calculate small delta
+		/*//Calculate small delta
 		deltaFinal[layerNum - 2] = aFinal[layerNum - 2] - y;
 
 		for(int i = layerNum - 3; i >= 0; i--)
@@ -167,7 +214,7 @@ double cvnn::trainConcurrentFuncApprox()
 			transpose(theta[i + 1], trans);
 			product = deltaFinal[i + 1] * trans;
 			deltaFinal[i] = product.colRange(0, product.size().width - 1).mul(sigmoidGradient(zFinal[i]));
-		}
+		}*/
 
 		//Calculate cost
 		J.push_back(sum(deltaFinal[layerNum - 2].mul(deltaFinal[layerNum - 2]))[0] / (2 * m));
@@ -204,11 +251,6 @@ double cvnn::trainFuncApprox()
 	int m = x.size().height;
 
 	J.clear();
-
-	cv::MatExpr e = x.col(0) == Mat(m, 1, CV_64F, 1);
-
-	if(sum(e)[0] != x.rows * 255)
-		hconcat(Mat(m, 1, CV_64F, 1), x, x);
 
 	Mat trans;
 	Mat product;
@@ -283,7 +325,7 @@ double cvnn::trainFuncApprox()
 		{
 			transpose(theta[i + 1], trans);
 			product = delta[i + 1] * trans;
-			delta[i] = product.colRange(0, product.size().width - 1).mul(sigmoidGradient(z[i]));
+			delta[i] = product.colRange(1, product.cols).mul(sigmoidGradient(z[i]));
 		}
 
 		//Calculate cost

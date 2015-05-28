@@ -92,11 +92,12 @@ int main()
 	vector<int> layers = {10, 40, 160, 1};
 	nn.setLayers(layers);
 	double singleTime = nn.train();
+	nn.setLayers(layers);
 	double concurrentTime = nn.trainConcurrent();
 	cout << "Single thread " << singleTime << " s" << endl;
 	cout << "Concurrent " << concurrentTime << " s" << endl;
 	cout << "Concurrent forward propagation is " << singleTime - concurrentTime << " s faster (" 
-	<< concurrentTime / singleTime * 100 << "%)" << endl;
+		<< concurrentTime / singleTime * 100 << "%)" << endl;
 	cout << "Finished, press enter to end" << endl;
 	getchar();
 }

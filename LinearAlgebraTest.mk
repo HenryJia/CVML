@@ -50,8 +50,8 @@ LibPath                := $(LibraryPathSwitch).
 AR       := /usr/bin/ar rcu
 CXX      := /usr/bin/g++
 CC       := /usr/bin/gcc
-CXXFLAGS :=  -g -O0 -std=c++11 -Wall -I /usr/include/eigen3/ -I /usr/include/lapackpp -I /usr/include/armadillo_bits/ -I /usr/include/opencv/  $(Preprocessors)
-CFLAGS   :=  -g -O0 -std=c++11 -Wall -I /usr/include/eigen3/ -I /usr/include/lapackpp -I /usr/include/armadillo_bits/ -I /usr/include/opencv/ $(Preprocessors)
+CXXFLAGS :=  -g -O1 -O -O3 -O0 -O2 -std=c++11 -Wall -I /usr/include/eigen3/ -I /usr/include/lapackpp -I /usr/include/armadillo_bits/ -I /usr/include/opencv/ $(Preprocessors)
+CFLAGS   :=  -g -O1 -O -O3 -O0 -O2 -std=c++11 -Wall -I /usr/include/eigen3/ -I /usr/include/lapackpp -I /usr/include/armadillo_bits/ -I /usr/include/opencv/ $(Preprocessors)
 ASFLAGS  := 
 AS       := /usr/bin/as
 

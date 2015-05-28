@@ -51,12 +51,7 @@ private:
 	vector<thread> t;
 	bool classification;
 
-	// Variables for training functions:
-	Mat trans;
-	Mat product;
-	Mat concatA;
-	Mat concatZ;
-
+	// Variables for concurrency:
 	vector<Mat> z;
 	vector<Mat> a;
 
@@ -64,13 +59,7 @@ private:
 	vector<Mat> Delta;
 	vector<Mat> thetaGrad;
 
-	vector<Mat> zFinal;
-	vector<Mat> aFinal;
-
-	vector<Mat> deltaFinal;
-	vector<Mat> DeltaFinal;
-	vector<Mat> thetaGradFinal;
-
-	// Functions for training functions
+	// Functions for concurrency
 	void forwardPropagate(size_t threadNum, int rangeLower, int rangeUpper);
+	void smallDelta(size_t threadNum, int rangeLower, int rangeUpper);
 };
