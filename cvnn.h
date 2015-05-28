@@ -59,7 +59,13 @@ private:
 	vector<Mat> Delta;
 	vector<Mat> thetaGrad;
 
+	vector<Mat> aFinal;
+	vector<Mat> deltaFinal;
+	vector<Mat> DeltaFinal;
+	vector<Mat> thetaGradFinal;
+
 	// Functions for concurrency
-	void forwardPropagate(size_t threadNum, int rangeLower, int rangeUpper);
 	void smallDelta(size_t threadNum, int rangeLower, int rangeUpper);
+	void concata();
+	void concatdelta();
 };

@@ -84,25 +84,6 @@ vector<vector<double>> cvnn::readCSV(string fileName, bool header, double &time)
 	return result;
 }
 
-void cvnn::forwardPropagate(size_t threadNum, int rangeLower, int rangeUpper)
-{
-	Mat data = x.rowRange(rangeLower, rangeUpper);
-	size_t base = threadNum * (layerNum - 1);
-	z[base] = data * theta[0];
-	a[base] = sigmoid(z[base]);
-	
-	for(size_t i = 1; i < layerNum - 2; i++)
-	{
-		hconcat(Mat(a[base + i - 1].size().height, 1, CV_64F, 1), a[base + i - 1], a[base + i - 1]);
-		z[base + i] = a[base + i - 1] * theta[i];
-		a[base + i] = sigmoid(z[base + i]);
-	}
-	
-	hconcat(Mat(a[base + layerNum - 3].size().height, 1, CV_64F, 1), a[base + layerNum - 3], a[base + layerNum - 3]);
-	z[base + layerNum - 2] = a[base + layerNum - 3] * theta[layerNum - 2];
-	a[base + layerNum - 2] = z[base + layerNum - 2];
-}
-
 void cvnn::smallDelta(size_t threadNum, int rangeLower, int rangeUpper)
 {
 	Mat data = x.rowRange(rangeLower, rangeUpper);
@@ -136,21 +117,38 @@ void cvnn::smallDelta(size_t threadNum, int rangeLower, int rangeUpper)
 	}
 }
 
+void cvnn::concata()
+{
+	Mat concat;
+	for(size_t j = 0; j < layerNum - 1; j++)
+	{
+		concat = a[j];
+		for(size_t k = 1; k < threads; k++)
+			vconcat(concat, a[k * (layerNum - 1) + j], concat);
+		aFinal[j] = concat;
+	}
+}
+
+void cvnn::concatdelta()
+{
+	Mat concat;
+	for(size_t j = 0; j < layerNum - 1; j++) 
+	{
+		concat = delta[j];
+		for(size_t k = 1; k < threads; k++) 
+			vconcat(concat, delta[k * (layerNum - 1) + j], concat);
+		deltaFinal[j] = concat;
+	}
+}
+
 double cvnn::trainConcurrentFuncApprox()
 {
 	auto start = chrono::steady_clock::now();
 
 	Mat concatA;
-	Mat concatZ;
 	Mat concatdelta;
 	Mat trans;
 
-	vector<Mat> zFinal;
-	vector<Mat> aFinal;
-
-	vector<Mat> deltaFinal;
-	vector<Mat> DeltaFinal;
-	vector<Mat> thetaGradFinal;
 
 	int m = x.size().height;
 
@@ -163,7 +161,6 @@ double cvnn::trainConcurrentFuncApprox()
 	Delta.resize(threads * (layerNum - 1));
 	thetaGrad.resize(threads * (layerNum - 1));
 
-	zFinal.resize(layerNum - 1);
 	aFinal.resize(layerNum - 1);
 
 	deltaFinal.resize(layerNum - 1);
@@ -189,36 +186,15 @@ double cvnn::trainConcurrentFuncApprox()
 		for(size_t j = 0; j < threads; j++)
 			if(t[j].joinable())
 				t[j].join();
-		//for(size_t j = 0; j < threads; j++)
-		//	smallDelta(j, lowerRanges[j], upperRanges[j]);
-		for(size_t j = 0; j < layerNum - 1; j++)
-		{
-			concatA = a[j];
-			concatZ = z[j];
-			concatdelta = delta[j];
-			for(size_t k = 1; k < threads; k++)
-			{
-				vconcat(concatA, a[k * (layerNum - 1) + j], concatA);
-				vconcat(concatZ, z[k * (layerNum - 1) + j], concatZ);
-				vconcat(concatdelta, delta[k * (layerNum - 1) + j], concatdelta);
-			}
-			aFinal[j] = concatA;
-			zFinal[j] = concatZ;
-			deltaFinal[j] = concatdelta;
-		}
-		/*//Calculate small delta
-		deltaFinal[layerNum - 2] = aFinal[layerNum - 2] - y;
-
-		for(int i = layerNum - 3; i >= 0; i--)
-		{
-			transpose(theta[i + 1], trans);
-			product = deltaFinal[i + 1] * trans;
-			deltaFinal[i] = product.colRange(0, product.size().width - 1).mul(sigmoidGradient(zFinal[i]));
-		}*/
 
 		//Calculate cost
 		J.push_back(sum(deltaFinal[layerNum - 2].mul(deltaFinal[layerNum - 2]))[0] / (2 * m));
 		cout << "Iteration " << i << ": " << "Cost: " << J[i] << endl;
+
+		thread concataThread(&cvnn::concata, this);
+		thread concatdeltaThread(&cvnn::concatdelta, this);
+		concataThread.join();
+		concatdeltaThread.join();
 
 		transpose(deltaFinal[0], trans);
 		DeltaFinal[0] = trans * x;
