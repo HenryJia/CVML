@@ -3,10 +3,10 @@
 ## any manual changes will be erased      
 ##
 ## Debug
-ProjectName            :=LinearAlgebraTest
+ProjectName            :=CVML
 ConfigurationName      :=Debug
 WorkspacePath          := "/home/henry/Coding/C++"
-ProjectPath            := "/home/henry/Coding/C++/LinearAlgebraTest"
+ProjectPath            := "/home/henry/Coding/C++/CVML"
 IntermediateDirectory  :=./Debug
 OutDir                 := $(IntermediateDirectory)
 CurrentFileName        :=
@@ -32,7 +32,7 @@ Preprocessors          :=
 ObjectSwitch           :=-o 
 ArchiveOutputSwitch    := 
 PreprocessOnlySwitch   :=-E
-ObjectsFileList        :="LinearAlgebraTest.txt"
+ObjectsFileList        :="CVML.txt"
 PCHCompileFlags        :=
 MakeDirCommand         :=mkdir -p
 LinkOptions            :=  
@@ -50,8 +50,8 @@ LibPath                := $(LibraryPathSwitch).
 AR       := /usr/bin/ar rcu
 CXX      := /usr/bin/g++
 CC       := /usr/bin/gcc
-CXXFLAGS :=  -g -O1 -O -O3 -O0 -O2 -std=c++11 -Wall -I /usr/include/eigen3/ -I /usr/include/lapackpp -I /usr/include/armadillo_bits/ -I /usr/include/opencv/ $(Preprocessors)
-CFLAGS   :=  -g -O1 -O -O3 -O0 -O2 -std=c++11 -Wall -I /usr/include/eigen3/ -I /usr/include/lapackpp -I /usr/include/armadillo_bits/ -I /usr/include/opencv/ $(Preprocessors)
+CXXFLAGS :=  -g -O1 -O -O3 -O0 -O2 -std=c++11 -Wall -I /usr/include/opencv/ $(Preprocessors)
+CFLAGS   :=  -g -O1 -O -O3 -O0 -O2 -std=c++11 -Wall -I /usr/include/opencv/ $(Preprocessors)
 ASFLAGS  := 
 AS       := /usr/bin/as
 
@@ -88,7 +88,7 @@ PreBuild:
 ## Objects
 ##
 $(IntermediateDirectory)/main.cpp$(ObjectSuffix): main.cpp $(IntermediateDirectory)/main.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/henry/Coding/C++/LinearAlgebraTest/main.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/main.cpp$(ObjectSuffix) $(IncludePath)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/henry/Coding/C++/CVML/main.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/main.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/main.cpp$(DependSuffix): main.cpp
 	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/main.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/main.cpp$(DependSuffix) -MM "main.cpp"
 
@@ -96,7 +96,7 @@ $(IntermediateDirectory)/main.cpp$(PreprocessSuffix): main.cpp
 	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/main.cpp$(PreprocessSuffix) "main.cpp"
 
 $(IntermediateDirectory)/cvnn.cpp$(ObjectSuffix): cvnn.cpp $(IntermediateDirectory)/cvnn.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/henry/Coding/C++/LinearAlgebraTest/cvnn.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/cvnn.cpp$(ObjectSuffix) $(IncludePath)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/henry/Coding/C++/CVML/cvnn.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/cvnn.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/cvnn.cpp$(DependSuffix): cvnn.cpp
 	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/cvnn.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/cvnn.cpp$(DependSuffix) -MM "cvnn.cpp"
 
