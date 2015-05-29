@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=
-Date                   :=28/05/15
+Date                   :=29/05/15
 CodeLitePath           :="/home/henry/.codelite"
 LinkerName             :=/usr/bin/g++
 SharedObjectLinkerName :=/usr/bin/g++ -shared -fPIC
@@ -39,8 +39,8 @@ LinkOptions            :=
 IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). 
 IncludePCH             := 
 RcIncludePath          := 
-Libs                   := $(LibrarySwitch)lapackpp $(LibrarySwitch)gfortran $(LibrarySwitch)blas $(LibrarySwitch)armadillo $(LibrarySwitch)opencv_core $(LibrarySwitch)opencv_features2d $(LibrarySwitch)opencv_flann $(LibrarySwitch)opencv_gpu $(LibrarySwitch)opencv_highgui $(LibrarySwitch)opencv_imgproc $(LibrarySwitch)opencv_legacy $(LibrarySwitch)opencv_ml $(LibrarySwitch)opencv_nonfree $(LibrarySwitch)opencv_objdetect $(LibrarySwitch)opencv_ocl $(LibrarySwitch)opencv_photo $(LibrarySwitch)opencv_stitching $(LibrarySwitch)opencv_superres $(LibrarySwitch)opencv_ts $(LibrarySwitch)opencv_video $(LibrarySwitch)opencv_videostab $(LibrarySwitch)tbb $(LibrarySwitch)rt $(LibrarySwitch)pthread $(LibrarySwitch)m $(LibrarySwitch)dl 
-ArLibs                 :=  "lapackpp" "gfortran" "blas" "armadillo" "opencv_core" "opencv_features2d" "opencv_flann" "opencv_gpu" "opencv_highgui" "opencv_imgproc" "opencv_legacy" "opencv_ml" "opencv_nonfree" "opencv_objdetect" "opencv_ocl" "opencv_photo" "opencv_stitching" "opencv_superres" "opencv_ts" "opencv_video" "opencv_videostab" "tbb" "rt" "pthread" "m" "dl" 
+Libs                   := $(LibrarySwitch)opencv_core $(LibrarySwitch)opencv_features2d $(LibrarySwitch)opencv_flann $(LibrarySwitch)opencv_gpu $(LibrarySwitch)opencv_highgui $(LibrarySwitch)opencv_imgproc $(LibrarySwitch)opencv_legacy $(LibrarySwitch)opencv_ml $(LibrarySwitch)opencv_nonfree $(LibrarySwitch)opencv_objdetect $(LibrarySwitch)opencv_ocl $(LibrarySwitch)opencv_photo $(LibrarySwitch)opencv_stitching $(LibrarySwitch)opencv_superres $(LibrarySwitch)opencv_ts $(LibrarySwitch)opencv_video $(LibrarySwitch)opencv_videostab $(LibrarySwitch)tbb $(LibrarySwitch)rt $(LibrarySwitch)pthread $(LibrarySwitch)m $(LibrarySwitch)dl 
+ArLibs                 :=  "opencv_core" "opencv_features2d" "opencv_flann" "opencv_gpu" "opencv_highgui" "opencv_imgproc" "opencv_legacy" "opencv_ml" "opencv_nonfree" "opencv_objdetect" "opencv_ocl" "opencv_photo" "opencv_stitching" "opencv_superres" "opencv_ts" "opencv_video" "opencv_videostab" "tbb" "rt" "pthread" "m" "dl" 
 LibPath                := $(LibraryPathSwitch). 
 
 ##

@@ -45,7 +45,7 @@ void cvnn::setData(vector<vector<double>> xVec, vector<vector<double>> yVec)
 {
 	x = vector2dToMat(xVec);
 	y = vector2dToMat(yVec);
-	int m = x.size().height;
+	m = x.size().height;
 	if(sum(x.col(0) == Mat(m, 1, CV_64F, 1))[0] != x.rows * 255)
 		hconcat(Mat(m, 1, CV_64F, 1), x, x);
 }
@@ -84,7 +84,7 @@ vector<vector<double>> cvnn::readCSV(string fileName, bool header, double &time)
 	return result;
 }
 
-void cvnn::smallDelta(size_t threadNum, int rangeLower, int rangeUpper)
+void cvnn::grad(size_t threadNum, int rangeLower, int rangeUpper)
 {
 	Mat data = x.rowRange(rangeLower, rangeUpper);
 	Mat datay = y.rowRange(rangeLower, rangeUpper);
@@ -115,29 +115,42 @@ void cvnn::smallDelta(size_t threadNum, int rangeLower, int rangeUpper)
 		product = delta[base + i + 1] * trans;
 		delta[base + i] = product.colRange(1, product.cols).mul(sigmoidGradient(z[base + i]));
 	}
+
+	transpose(delta[base], trans);
+	Delta[base] = trans * data;
+
+	for(size_t i = 1; i < layerNum - 1; i++)
+	{
+		transpose(delta[base + i], trans);
+		Delta[base + i] = trans * a[base + i - 1];
+	}
+
+	for(size_t i = 0; i < layerNum - 1; i++)
+	{
+		transpose(Delta[base + i], trans);
+		thetaGrad[base + i] = trans / m;
+	}
+
+	JBatch[threadNum] = sum(delta[base + layerNum - 2].mul(delta[base + layerNum - 2]))[0] / (2 * m);
 }
 
-void cvnn::concata()
+void cvnn::sumJ()
 {
-	Mat concat;
+	//Calculate cost
+	J.push_back(JBatch[0]);
+	for(size_t j = 1; j < threads; j++)
+			J.back() += JBatch[j];
+}
+
+void cvnn::sumthetaGrad()
+{
+	Mat sum;
 	for(size_t j = 0; j < layerNum - 1; j++)
 	{
-		concat = a[j];
+		sum = thetaGrad[j];
 		for(size_t k = 1; k < threads; k++)
-			vconcat(concat, a[k * (layerNum - 1) + j], concat);
-		aFinal[j] = concat;
-	}
-}
-
-void cvnn::concatdelta()
-{
-	Mat concat;
-	for(size_t j = 0; j < layerNum - 1; j++) 
-	{
-		concat = delta[j];
-		for(size_t k = 1; k < threads; k++) 
-			vconcat(concat, delta[k * (layerNum - 1) + j], concat);
-		deltaFinal[j] = concat;
+		sum += thetaGrad[k * (layerNum - 1) + j];
+		thetaGradFinal[j] = sum;
 	}
 }
 
@@ -145,14 +158,8 @@ double cvnn::trainConcurrentFuncApprox()
 {
 	auto start = chrono::steady_clock::now();
 
-	Mat concatA;
-	Mat concatdelta;
-	Mat trans;
-
-
-	int m = x.size().height;
-
 	J.clear();
+	JBatch.resize(threads);
 
 	z.resize(threads * (layerNum - 1));
 	a.resize(threads * (layerNum - 1));
@@ -182,35 +189,20 @@ double cvnn::trainConcurrentFuncApprox()
 	for(int i = 0; i < iters; i++)
 	{
 		for(size_t j = 0; j < threads; j++)
-			t[j] = thread(&cvnn::smallDelta, this, j, lowerRanges[j], upperRanges[j]);
+			t[j] = thread(&cvnn::grad, this, j, lowerRanges[j], upperRanges[j]);
 		for(size_t j = 0; j < threads; j++)
 			if(t[j].joinable())
 				t[j].join();
 
+		thread sumthetaGradThread(&cvnn::sumthetaGrad, this);
+
 		//Calculate cost
-		J.push_back(sum(deltaFinal[layerNum - 2].mul(deltaFinal[layerNum - 2]))[0] / (2 * m));
+		J.push_back(JBatch[0]);
+		for(size_t j = 1; j < threads; j++)
+			J.back() += JBatch[j];
 		cout << "Iteration " << i << ": " << "Cost: " << J[i] << endl;
 
-		thread concataThread(&cvnn::concata, this);
-		thread concatdeltaThread(&cvnn::concatdelta, this);
-		concataThread.join();
-		concatdeltaThread.join();
-
-		transpose(deltaFinal[0], trans);
-		DeltaFinal[0] = trans * x;
-
-		for(size_t i = 1; i < layerNum - 1; i++)
-		{
-			transpose(deltaFinal[i], trans);
-			DeltaFinal[i] = trans * aFinal[i - 1];
-		}
-
-		for(size_t i = 0; i < layerNum - 1; i++)
-		{
-			transpose(DeltaFinal[i], trans);
-			thetaGradFinal[i] = trans / m;
-		}
-
+		sumthetaGradThread.join();
 		for(size_t i = 1; i < layerNum - 1; i++)
 			theta[i] = theta[i] - alpha * thetaGradFinal[i];
 	}
@@ -231,46 +223,16 @@ double cvnn::trainFuncApprox()
 	Mat trans;
 	Mat product;
 
-	/*Mat z2;
-	Mat a2;
-	Mat z3;
-	Mat a3;
-	Mat z4;
-	Mat a4;*/
-
 	Mat z[layerNum - 1];
 	Mat a[layerNum - 1];
 
-	/*Mat delta4;
-	Mat delta3;
-	Mat delta2;*/
-
 	Mat delta[layerNum - 1];
 
-	/*Mat Delta3;
-	Mat Delta2;
-	Mat Delta1;*/
-
 	Mat Delta[layerNum - 1];
-
-	/*Mat theta3Grad;
-	Mat theta2Grad;
-	Mat theta1Grad;*/
 
 	Mat thetaGrad[layerNum - 1];
 	for(int i = 0; i < iters; i++)
 	{
-		//Forward propagation
-		/*z2 = x * theta1;
-		a2 = sigmoid(z2);
-
-		hconcat(Mat(a2.size().height, 1, CV_64F, 1), a2, a2);
-		z3 = a2 * theta2;
-		a3 = sigmoid(z3);
-
-		hconcat(Mat(a3.size().height, 1, CV_64F, 1), a3, a3);
-		z4 = a3 * theta3;
-		a4 = z4;*/
 
 		z[0] = x * theta[0];
 		a[0] = sigmoid(z[0]);
@@ -289,14 +251,6 @@ double cvnn::trainFuncApprox()
 		//Calculate small delta
 		delta[layerNum - 2] = a[layerNum - 2] - y;
 
-		/*transpose(theta3, trans);
-		product = delta4 * trans;
-		delta3 = product.colRange(0, product.size().width - 1).mul(sigmoidGradient(z3));
-
-		transpose(theta2, trans);
-		product = delta3 * trans;
-		delta2 = product.colRange(0, product.size().width - 1).mul(sigmoidGradient(z2));*/
-
 		for(int i = layerNum - 3; i >= 0; i--)
 		{
 			transpose(theta[i + 1], trans);
@@ -308,16 +262,6 @@ double cvnn::trainFuncApprox()
 		J.push_back(sum(delta[layerNum - 2].mul(delta[layerNum - 2]))[0] / (2 * m));
 		cout << "Iteration " << i << ": " << "Cost: " << J[i] << endl;
 
-		//Accumulate small delta and calculate big delta which is the partial derivatives
-		/*transpose(delta4, trans);
-		Delta3 = trans * a3;
-
-		transpose(delta3, trans);
-		Delta2 = trans * a2;
-
-		transpose(delta2, trans);
-		Delta1 = trans * x;*/
-
 		transpose(delta[0], trans);
 		Delta[0] = trans * x;
 
@@ -327,26 +271,11 @@ double cvnn::trainFuncApprox()
 			Delta[i] = trans * a[i - 1];
 		}
 
-		//Finish off the calculation
-		/*transpose(Delta3, trans);
-		theta3Grad = trans / m;
-
-		transpose(Delta2, trans);
-		theta2Grad = trans / m;
-
-		transpose(Delta1, trans);
-		theta1Grad = trans / m;*/
-
 		for(size_t i = 0; i < layerNum - 1; i++)
 		{
 			transpose(Delta[i], trans);
 			thetaGrad[i] = trans / m;
 		}
-
-		//Gradient descent
-		/*theta3 = theta3 - alpha * theta3Grad;
-		theta2 = theta2 - alpha * theta2Grad;
-		theta1 = theta1 - alpha * theta1Grad;*/
 
 		for(size_t i = 1; i < layerNum - 1; i++)
 			theta[i] = theta[i] - alpha * thetaGrad[i];

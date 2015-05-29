@@ -48,10 +48,13 @@ private:
 	vector<Mat> theta;
 	vector<int> layers;
 	vector<double> J;
+	vector<double> JBatch;
 	vector<thread> t;
 	bool classification;
 
 	// Variables for concurrency:
+	int m;
+
 	vector<Mat> z;
 	vector<Mat> a;
 
@@ -65,7 +68,7 @@ private:
 	vector<Mat> thetaGradFinal;
 
 	// Functions for concurrency
-	void smallDelta(size_t threadNum, int rangeLower, int rangeUpper);
-	void concata();
-	void concatdelta();
+	void grad(size_t threadNum, int rangeLower, int rangeUpper);
+	void sumJ();
+	void sumthetaGrad();
 };
