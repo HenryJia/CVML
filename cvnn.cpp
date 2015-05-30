@@ -235,6 +235,7 @@ double cvnn::trainConcurrentFuncApprox()
 	if(sum(x.col(0) == Mat(m, 1, CV_64F, 1))[0] != m * 255)
 		hconcat(Mat(m, 1, CV_64F, 1), x, x);
 
+	cout << x.rowRange(0, 4).colRange(0, 4) << endl;
 	J.clear();
 	JBatch.resize(threads);
 
@@ -401,6 +402,7 @@ Mat cvnn::sigmoidGradient(Mat data)
 
 Mat cvnn::normalise(Mat data)
 {
+	Mat result(data.rows, data.cols, CV_64F);
 	Mat mean(1, data.cols, CV_64F);
 	Mat stddev(1, data.cols, CV_64F);
 	for (int i = 0; i < data.cols; i++)
@@ -412,8 +414,8 @@ Mat cvnn::normalise(Mat data)
     }
 	for(int i = 0; i < data.rows; ++i)
 	{
-		data.row(i) -= mean;
-		data.row(i).mul(1 / stddev);
+		result.row(i) = data.row(i) - mean;
+		result.row(i) = result.row(i) / stddev;
 	}
-	return data;
+	return result;
 }
