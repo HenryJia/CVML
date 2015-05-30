@@ -35,7 +35,7 @@ int main()
 	nn.setIters(10);
 	nn.setClassify(false);
 	//nn.setThreads(4);
-	vector<int> layers = {10, 40, 160, 640, 1};
+	vector<int> layers = {10, 40, 160, 1};
 	nn.setLayers(layers);
 	double concurrentTime = nn.trainConcurrent();
 	cout << "Concurrent Training" << concurrentTime << " s" << endl;
