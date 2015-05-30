@@ -373,6 +373,7 @@ Mat cvnn::randInitialiseWeights(int in, int out)
 	double epsilon = sqrt(6) / sqrt(1 + in + out);
 
 	Mat weights(in + 1, out, CV_64F);
+	cv::theRNG().state = getTickCount();
 	randu(weights, 0.0, 1.0);
 
 	weights = weights * epsilon - epsilon;

@@ -14,7 +14,7 @@ include_directories(
 set(CMAKE_LDFLAGS "${CMAKE_LDFLAGS}  ")
 
 # Library path
-set(CMAKE_LDFLAGS "${CMAKE_LDFLAGS} -L\".\" ")
+set(CMAKE_LDFLAGS "${CMAKE_LDFLAGS} -L\".\" -L\"OpenCV\" ")
 
 # Define the CXX sources
 set ( CXX_SRCS
@@ -26,26 +26,12 @@ set_source_files_properties(
     ${CXX_SRCS} PROPERTIES COMPILE_FLAGS 
     " -g -O1 -O -O3 -O0 -O2 -std=c++11 -Wall -I /usr/include/opencv/")
 
+find_package( OpenCV REQUIRED )
+
 add_executable(CVML ${CXX_SRCS} ${C_SRCS})
 
 target_link_libraries(CVML
-    opencv_core
-    opencv_features2d
-    opencv_flann
-    opencv_gpu
-    opencv_highgui
-    opencv_imgproc
-    opencv_legacy
-    opencv_ml
-    opencv_nonfree
-    opencv_objdetect
-    opencv_ocl
-    opencv_photo
-    opencv_stitching
-    opencv_superres
-    opencv_ts
-    opencv_video
-    opencv_videostab
+    ${OpenCV_LIBS}
     tbb
     rt
     pthread
