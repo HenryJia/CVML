@@ -295,6 +295,9 @@ double cvnn::trainFuncApprox()
 
 	int m = x.rows;
 
+	if(sum(x.col(0) == Mat(m, 1, CV_64F, 1))[0] != m * 255)
+		hconcat(Mat(m, 1, CV_64F, 1), x, x);
+
 	J.clear();
 
 	Mat trans;
@@ -308,6 +311,7 @@ double cvnn::trainFuncApprox()
 	Mat Delta[layerNum - 1];
 
 	Mat thetaGrad[layerNum - 1];
+
 	for(int i = 0; i < iters; i++)
 	{
 
@@ -370,7 +374,7 @@ Mat cvnn::randInitialiseWeights(int in, int out)
 	cv::theRNG().state = getTickCount();
 	randu(weights, 0.0, 1.0);
 
-	weights = weights * epsilon - epsilon;
+	weights = abs(weights * 2 * epsilon - epsilon);
 
 	return weights;
 }
