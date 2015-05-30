@@ -80,6 +80,5 @@ private:
 
 	// Functions for concurrency
 	void grad(size_t threadNum, int rangeLower, int rangeUpper);
-	void sumJ();
 	void sumthetaGrad();
 };

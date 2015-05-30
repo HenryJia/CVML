@@ -217,14 +217,6 @@ void cvnn::grad(size_t threadNum, int rangeLower, int rangeUpper)
 	JBatch[threadNum] = sum(delta[base + layerNum - 2].mul(delta[base + layerNum - 2]))[0] / (2 * m);
 }
 
-void cvnn::sumJ()
-{
-	//Calculate cost
-	J.push_back(JBatch[0]);
-	for(size_t j = 1; j < threads; j++)
-			J.back() += JBatch[j];
-}
-
 void cvnn::sumthetaGrad()
 {
 	Mat sum;
