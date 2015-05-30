@@ -235,7 +235,6 @@ double cvnn::trainConcurrentFuncApprox()
 	if(sum(x.col(0) == Mat(m, 1, CV_64F, 1))[0] != m * 255)
 		hconcat(Mat(m, 1, CV_64F, 1), x, x);
 
-	cout << x.rowRange(0, 4).colRange(0, 4) << endl;
 	J.clear();
 	JBatch.resize(threads);
 
