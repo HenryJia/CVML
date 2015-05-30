@@ -30,6 +30,55 @@ double cvnn::trainConcurrent()
 	return time;
 }
 
+double cvnn::validate()
+{
+	Mat z[layerNum - 1];
+	Mat a[layerNum - 1];
+
+	z[0] = xValidate * theta[0];
+	a[0] = sigmoid(z[0]);
+	
+	for(size_t i = 1; i < layerNum - 2; i++)
+	{
+		hconcat(Mat(a[i - 1].size().height, 1, CV_64F, 1), a[i - 1], a[i - 1]);
+		z[i] = a[i - 1] * theta[i];
+		a[i] = sigmoid(z[i]);
+	}
+
+	hconcat(Mat(a[layerNum - 3].size().height, 1, CV_64F, 1), a[layerNum - 3], a[layerNum - 3]);
+		z[layerNum - 2] = a[layerNum - 3] * theta[layerNum - 2];
+		a[layerNum - 2] = z[layerNum - 2];
+
+	Mat delta = a[layerNum - 2] - yValidate;
+
+	//Calculate cost
+	JValidate = sum(delta.mul(delta))[0] / (2 * mValidate);
+	cout << "Validation Cost: " << JValidate << endl;
+	return JValidate;
+}
+
+double cvnn::predict(string fileName)
+{
+	Mat z[layerNum - 1];
+	Mat a[layerNum - 1];
+
+	z[0] = xPredict * theta[0];
+	a[0] = sigmoid(z[0]);
+	
+	for(size_t i = 1; i < layerNum - 2; i++)
+	{
+		hconcat(Mat(a[i - 1].size().height, 1, CV_64F, 1), a[i - 1], a[i - 1]);
+		z[i] = a[i - 1] * theta[i];
+		a[i] = sigmoid(z[i]);
+	}
+
+	hconcat(Mat(a[layerNum - 3].size().height, 1, CV_64F, 1), a[layerNum - 3], a[layerNum - 3]);
+		z[layerNum - 2] = a[layerNum - 3] * theta[layerNum - 2];
+		a[layerNum - 2] = z[layerNum - 2];
+
+	return writeCSV(fileName, a[layerNum - 2]);
+}
+
 void cvnn::setLayers(vector<int> l)
 {
 	layers = l;
@@ -46,8 +95,26 @@ void cvnn::setData(vector<vector<double>> xVec, vector<vector<double>> yVec)
 	x = vector2dToMat(xVec);
 	y = vector2dToMat(yVec);
 	m = x.size().height;
-	if(sum(x.col(0) == Mat(m, 1, CV_64F, 1))[0] != x.rows * 255)
+	if(sum(x.col(0) == Mat(m, 1, CV_64F, 1))[0] != m * 255)
 		hconcat(Mat(m, 1, CV_64F, 1), x, x);
+}
+
+void cvnn::setValidateData(vector<vector<double>> xVec, vector<vector<double>> yVec)
+{
+	xValidate = vector2dToMat(xVec);
+	yValidate = vector2dToMat(yVec);
+	mValidate = xValidate.size().height;
+	if(sum(xValidate.col(0) == Mat(mValidate, 1, CV_64F, 1))[0] != mValidate * 255)
+		hconcat(Mat(mValidate, 1, CV_64F, 1), xValidate, xValidate);
+}
+
+void cvnn::setPredictData(vector<vector<double>> xVec)
+{
+	xPredict = vector2dToMat(xVec);
+	mPredict = xPredict.size().height;
+	if(sum(xPredict.col(0) == Mat(mPredict, 1, CV_64F, 1))[0] != mPredict * 255)
+		hconcat(Mat(mPredict, 1, CV_64F, 1), xPredict, xPredict);
+	
 }
 
 vector<vector<double>> cvnn::readCSV(string fileName, bool header, double &time)
@@ -82,6 +149,22 @@ vector<vector<double>> cvnn::readCSV(string fileName, bool header, double &time)
 	time = chrono::duration <double> (elapsed).count();
 
 	return result;
+}
+
+double cvnn::writeCSV(string fileName, Mat data)
+{
+	auto start = chrono::steady_clock::now();
+
+	vector<vector<double>> result;
+	ofstream out(fileName);
+
+	for(int i = 0; i < mPredict; i++)
+		out << data.row(i) << endl;
+
+	auto end = chrono::steady_clock::now();
+	auto elapsed = end - start;
+
+	return chrono::duration <double> (elapsed).count();;
 }
 
 void cvnn::grad(size_t threadNum, int rangeLower, int rangeUpper)

@@ -17,6 +17,8 @@ public:
 
 	double train();
 	double trainConcurrent();
+	double validate();
+	double predict(string fileName);
 	void setLayers(vector<int> layers);
 	void setClassify(bool c) { classification = c; }
 	void setAlpha(double a) { alpha = a; }
@@ -24,6 +26,8 @@ public:
 	void setIters(int i) { iters = i; }
 	void setLambda(int l) { lambda = l; }
 	void setData(vector<vector<double>> xVec, vector<vector<double>> yVec);
+	void setValidateData(vector<vector<double>> xVec, vector<vector<double>> yVec);
+	void setPredictData(vector<vector<double>> xVec);
 
 	vector<Mat> getTheta() { return theta; }
 
@@ -37,14 +41,19 @@ private:
 	Mat vector2dToMat(vector<vector<double>> data);
 	Mat sigmoid(Mat data);
 	Mat sigmoidGradient(Mat data);
+	double writeCSV(string fileName, Mat data);
 
 	double alpha;
 	double lambda;
+	double JValidate;
 	int iters;
 	size_t threads;
 	size_t layerNum;
 	Mat x;
+	Mat xValidate;
+	Mat xPredict;
 	Mat y;
+	Mat yValidate;
 	vector<Mat> theta;
 	vector<int> layers;
 	vector<double> J;
@@ -54,6 +63,8 @@ private:
 
 	// Variables for concurrency:
 	int m;
+	int mValidate;
+	int mPredict;
 
 	vector<Mat> z;
 	vector<Mat> a;
