@@ -35,17 +35,20 @@ double cvnn::validate()
 	Mat z[layerNum - 1];
 	Mat a[layerNum - 1];
 
+	if(sum(xValidate.col(0) == Mat(mValidate, 1, CV_64F, 1))[0] != mValidate * 255)
+		hconcat(Mat(mValidate, 1, CV_64F, 1), xValidate, xValidate);
+	
 	z[0] = xValidate * theta[0];
 	a[0] = sigmoid(z[0]);
 	
 	for(size_t i = 1; i < layerNum - 2; i++)
 	{
-		hconcat(Mat(a[i - 1].size().height, 1, CV_64F, 1), a[i - 1], a[i - 1]);
+		hconcat(Mat(a[i - 1].rows, 1, CV_64F, 1), a[i - 1], a[i - 1]);
 		z[i] = a[i - 1] * theta[i];
 		a[i] = sigmoid(z[i]);
 	}
 
-	hconcat(Mat(a[layerNum - 3].size().height, 1, CV_64F, 1), a[layerNum - 3], a[layerNum - 3]);
+	hconcat(Mat(a[layerNum - 3].rows, 1, CV_64F, 1), a[layerNum - 3], a[layerNum - 3]);
 		z[layerNum - 2] = a[layerNum - 3] * theta[layerNum - 2];
 		a[layerNum - 2] = z[layerNum - 2];
 
@@ -62,17 +65,20 @@ double cvnn::predict(string fileName)
 	Mat z[layerNum - 1];
 	Mat a[layerNum - 1];
 
+	if(sum(xPredict.col(0) == Mat(mPredict, 1, CV_64F, 1))[0] != mPredict * 255)
+		hconcat(Mat(mPredict, 1, CV_64F, 1), xPredict, xPredict);
+
 	z[0] = xPredict * theta[0];
 	a[0] = sigmoid(z[0]);
 	
 	for(size_t i = 1; i < layerNum - 2; i++)
 	{
-		hconcat(Mat(a[i - 1].size().height, 1, CV_64F, 1), a[i - 1], a[i - 1]);
+		hconcat(Mat(a[i - 1].rows, 1, CV_64F, 1), a[i - 1], a[i - 1]);
 		z[i] = a[i - 1] * theta[i];
 		a[i] = sigmoid(z[i]);
 	}
 
-	hconcat(Mat(a[layerNum - 3].size().height, 1, CV_64F, 1), a[layerNum - 3], a[layerNum - 3]);
+	hconcat(Mat(a[layerNum - 3].rows, 1, CV_64F, 1), a[layerNum - 3], a[layerNum - 3]);
 		z[layerNum - 2] = a[layerNum - 3] * theta[layerNum - 2];
 		a[layerNum - 2] = z[layerNum - 2];
 
@@ -94,27 +100,20 @@ void cvnn::setData(vector<vector<double>> xVec, vector<vector<double>> yVec)
 {
 	x = vector2dToMat(xVec);
 	y = vector2dToMat(yVec);
-	m = x.size().height;
-	if(sum(x.col(0) == Mat(m, 1, CV_64F, 1))[0] != m * 255)
-		hconcat(Mat(m, 1, CV_64F, 1), x, x);
+	m = x.rows;
 }
 
 void cvnn::setValidateData(vector<vector<double>> xVec, vector<vector<double>> yVec)
 {
 	xValidate = vector2dToMat(xVec);
 	yValidate = vector2dToMat(yVec);
-	mValidate = xValidate.size().height;
-	if(sum(xValidate.col(0) == Mat(mValidate, 1, CV_64F, 1))[0] != mValidate * 255)
-		hconcat(Mat(mValidate, 1, CV_64F, 1), xValidate, xValidate);
+	mValidate = xValidate.rows;
 }
 
 void cvnn::setPredictData(vector<vector<double>> xVec)
 {
 	xPredict = vector2dToMat(xVec);
-	mPredict = xPredict.size().height;
-	if(sum(xPredict.col(0) == Mat(mPredict, 1, CV_64F, 1))[0] != mPredict * 255)
-		hconcat(Mat(mPredict, 1, CV_64F, 1), xPredict, xPredict);
-	
+	mPredict = xPredict.rows;
 }
 
 vector<vector<double>> cvnn::readCSV(string fileName, bool header, double &time)
@@ -181,12 +180,12 @@ void cvnn::grad(size_t threadNum, int rangeLower, int rangeUpper)
 	
 	for(size_t i = 1; i < layerNum - 2; i++)
 	{
-		hconcat(Mat(a[base + i - 1].size().height, 1, CV_64F, 1), a[base + i - 1], a[base + i - 1]);
+		hconcat(Mat(a[base + i - 1].rows, 1, CV_64F, 1), a[base + i - 1], a[base + i - 1]);
 		z[base + i] = a[base + i - 1] * theta[i];
 		a[base + i] = sigmoid(z[base + i]);
 	}
 	
-	hconcat(Mat(a[base + layerNum - 3].size().height, 1, CV_64F, 1), a[base + layerNum - 3], a[base + layerNum - 3]);
+	hconcat(Mat(a[base + layerNum - 3].rows, 1, CV_64F, 1), a[base + layerNum - 3], a[base + layerNum - 3]);
 	z[base + layerNum - 2] = a[base + layerNum - 3] * theta[layerNum - 2];
 	a[base + layerNum - 2] = z[base + layerNum - 2];
 
@@ -232,6 +231,9 @@ void cvnn::sumthetaGrad()
 double cvnn::trainConcurrentFuncApprox()
 {
 	auto start = chrono::steady_clock::now();
+
+	if(sum(x.col(0) == Mat(m, 1, CV_64F, 1))[0] != m * 255)
+		hconcat(Mat(m, 1, CV_64F, 1), x, x);
 
 	J.clear();
 	JBatch.resize(threads);
@@ -291,7 +293,7 @@ double cvnn::trainFuncApprox()
 {
 	auto start = chrono::steady_clock::now();
 
-	int m = x.size().height;
+	int m = x.rows;
 
 	J.clear();
 
@@ -314,12 +316,12 @@ double cvnn::trainFuncApprox()
 
 		for(size_t i = 1; i < layerNum - 2; i++)
 		{
-			hconcat(Mat(a[i - 1].size().height, 1, CV_64F, 1), a[i - 1], a[i - 1]);
+			hconcat(Mat(a[i - 1].rows, 1, CV_64F, 1), a[i - 1], a[i - 1]);
 			z[i] = a[i - 1] * theta[i];
 			a[i] = sigmoid(z[i]);
 		}
 
-		hconcat(Mat(a[layerNum - 3].size().height, 1, CV_64F, 1), a[layerNum - 3], a[layerNum - 3]);
+		hconcat(Mat(a[layerNum - 3].rows, 1, CV_64F, 1), a[layerNum - 3], a[layerNum - 3]);
 		z[layerNum - 2] = a[layerNum - 3] * theta[layerNum - 2];
 		a[layerNum - 2] = z[layerNum - 2];
 
@@ -395,4 +397,23 @@ Mat cvnn::sigmoidGradient(Mat data)
 {
 	Mat sig = sigmoid(data);
 	return sig.mul(1 - sig);
+}
+
+Mat cvnn::normalise(Mat data)
+{
+	Mat mean(1, data.cols, CV_64F);
+	Mat stddev(1, data.cols, CV_64F);
+	for (int i = 0; i < data.cols; i++)
+	{
+		cv::Mat meanValue, stdValue;
+		meanStdDev(data.col(i), meanValue, stdValue);
+		stddev.at<double>(i) = stdValue.at<double>(0);
+		mean.at<double>(i) = meanValue.at<double>(0);
+    }
+	for(int i = 0; i < data.rows; ++i)
+	{
+		data.row(i) -= mean;
+		data.row(i).mul(1 / stddev);
+	}
+	return data;
 }

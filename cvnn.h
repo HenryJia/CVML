@@ -28,6 +28,9 @@ public:
 	void setData(vector<vector<double>> xVec, vector<vector<double>> yVec);
 	void setValidateData(vector<vector<double>> xVec, vector<vector<double>> yVec);
 	void setPredictData(vector<vector<double>> xVec);
+	void normaliseData() { x = normalise(x); }
+	void normaliseValidateData() { xValidate = normalise(xValidate); }
+	void normalisePredictData() { xPredict = normalise(xPredict); }
 
 	vector<Mat> getTheta() { return theta; }
 
@@ -41,6 +44,7 @@ private:
 	Mat vector2dToMat(vector<vector<double>> data);
 	Mat sigmoid(Mat data);
 	Mat sigmoidGradient(Mat data);
+	Mat normalise(Mat data);
 	double writeCSV(string fileName, Mat data);
 
 	double alpha;

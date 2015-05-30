@@ -31,6 +31,9 @@ int main()
 	nn.setData(xVec, yVec);
 	nn.setValidateData(xVecValidate, yVecValidate);
 	nn.setPredictData(xVecPredict);
+	nn.normaliseData();
+	nn.normaliseValidateData();
+	nn.normalisePredictData();
 	nn.setAlpha(0.015);
 	nn.setIters(10);
 	nn.setClassify(false);
