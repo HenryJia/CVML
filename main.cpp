@@ -35,7 +35,7 @@ int main()
 	nn.normaliseValidateData();
 	nn.normalisePredictData();
 	nn.setAlpha(0.00025);
-	nn.setIters(60000);
+	nn.setIters(100);
 	nn.setClassify(false);
 	//nn.setThreads(4);
 	vector<int> layers = {10, 40, 160, 1};
