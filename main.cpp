@@ -32,19 +32,19 @@ int main()
 	nn.setValidateData(xVecValidate, yVecValidate);
 	nn.setPredictData(xVecPredict);
 	nn.normaliseData();
-	nn.normaliseValidateData();
-	nn.normalisePredictData();
+	//nn.normaliseValidateData();
+	//nn.normalisePredictData();
 	nn.setAlpha(0.015);
 	nn.setIters(10);
 	nn.setClassify(false);
 	//nn.setThreads(4);
 	vector<int> layers = {10, 40, 160, 1};
 	nn.setLayers(layers);
-	double concurrentTime = nn.trainConcurrent();
+	double concurrentTime = nn.train();
 	cout << "Concurrent Training" << concurrentTime << " s" << endl;
-	nn.validate();
+	//nn.validate();
 	cout << "Write CSV" << endl;
-	cout << nn.predict("result1.csv") << " s" << endl;
+	//cout << nn.predict("result1.csv") << " s" << endl;
 	cout << "Finished, press enter to end" << endl;
 	getchar();
 }

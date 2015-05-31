@@ -263,6 +263,11 @@ double cvnn::trainConcurrentFuncApprox()
 	}
 	upperRanges[threads - 1] = m;
 
+	double tem;
+	theta[0] = vector2dToMat(readCSV("InitialTheta1.csv", false, tem));
+	theta[1] = vector2dToMat(readCSV("InitialTheta2.csv", false, tem));
+	theta[2] = vector2dToMat(readCSV("InitialTheta3.csv", false, tem));
+
 	for(int i = 0; i < iters; i++)
 	{
 		for(size_t j = 0; j < threads; j++)
@@ -280,8 +285,8 @@ double cvnn::trainConcurrentFuncApprox()
 		cout << "Iteration " << i << ": " << "Cost: " << J[i] << endl;
 
 		sumthetaGradThread.join();
-		for(size_t i = 1; i < layerNum - 1; i++)
-			theta[i] = theta[i] - alpha * thetaGradFinal[i];
+		for(size_t j = 0; j < layerNum - 1; j++)
+			theta[j] = theta[j] - alpha * thetaGradFinal[j];
 	}
 
 	auto end = chrono::steady_clock::now();
@@ -300,29 +305,34 @@ double cvnn::trainFuncApprox()
 
 	J.clear();
 
-	Mat trans;
-	Mat product;
 
-	Mat z[layerNum - 1];
-	Mat a[layerNum - 1];
-
-	Mat delta[layerNum - 1];
-
-	Mat Delta[layerNum - 1];
-
-	Mat thetaGrad[layerNum - 1];
+	double tem;
+	theta[0] = vector2dToMat(readCSV("InitialTheta1.csv", false, tem));
+	theta[1] = vector2dToMat(readCSV("InitialTheta2.csv", false, tem));
+	theta[2] = vector2dToMat(readCSV("InitialTheta3.csv", false, tem));
 
 	for(int i = 0; i < iters; i++)
 	{
 
+		Mat trans;
+		Mat product;
+
+		Mat z[layerNum - 1];
+		Mat a[layerNum - 1];
+
+		Mat delta[layerNum - 1];
+
+		Mat Delta[layerNum - 1];
+
+		Mat thetaGrad[layerNum - 1];
+		cout << "theta " << layerNum - 2 << ": " << theta[layerNum - 2].row(0).col(0) << endl << endl;
 		z[0] = x * theta[0];
 		a[0] = sigmoid(z[0]);
-
-		for(size_t i = 1; i < layerNum - 2; i++)
+		for(size_t j = 1; j < layerNum - 2; j++)
 		{
-			hconcat(Mat(a[i - 1].rows, 1, CV_64F, 1), a[i - 1], a[i - 1]);
-			z[i] = a[i - 1] * theta[i];
-			a[i] = sigmoid(z[i]);
+			hconcat(Mat(a[j - 1].rows, 1, CV_64F, 1), a[j - 1], a[j - 1]);
+			z[j] = a[j - 1] * theta[j];
+			a[j] = sigmoid(z[j]);
 		}
 
 		hconcat(Mat(a[layerNum - 3].rows, 1, CV_64F, 1), a[layerNum - 3], a[layerNum - 3]);
@@ -331,35 +341,37 @@ double cvnn::trainFuncApprox()
 
 		//Calculate small delta
 		delta[layerNum - 2] = a[layerNum - 2] - y;
-
-		for(int i = layerNum - 3; i >= 0; i--)
-		{
-			transpose(theta[i + 1], trans);
-			product = delta[i + 1] * trans;
-			delta[i] = product.colRange(1, product.cols).mul(sigmoidGradient(z[i]));
-		}
-
 		//Calculate cost
 		J.push_back(sum(delta[layerNum - 2].mul(delta[layerNum - 2]))[0] / (2 * m));
 		cout << "Iteration " << i << ": " << "Cost: " << J[i] << endl;
+		cout << "delta " << layerNum - 2 << ": " << delta[layerNum - 2].row(0).col(0) << endl << endl;
+		for(int j = layerNum - 3; j >= 0; j--)
+		{
+			transpose(theta[j + 1], trans);
+			product = delta[j + 1] * trans;
+			delta[j] = product.colRange(1, product.cols).mul(sigmoidGradient(z[j]));
+			cout << "delta " << j + 1 << ": " << delta[j + 1].row(0).col(0) << endl;
+			cout << "theta " << j + 1 << ": " << theta[j + 1].row(0).col(0) << endl;
+			cout << "product " << j << ": " << product.row(0).col(1) << endl;
+		}
 
 		transpose(delta[0], trans);
 		Delta[0] = trans * x;
 
-		for(size_t i = 1; i < layerNum - 1; i++)
+		for(size_t j = 1; j < layerNum - 1; j++)
 		{
-			transpose(delta[i], trans);
-			Delta[i] = trans * a[i - 1];
+			transpose(delta[j], trans);
+			Delta[j] = trans * a[j - 1];
 		}
 
-		for(size_t i = 0; i < layerNum - 1; i++)
+		for(size_t j = 0; j < layerNum - 1; j++)
 		{
-			transpose(Delta[i], trans);
-			thetaGrad[i] = trans / m;
+			transpose(Delta[j], trans);
+			thetaGrad[j] = trans / m;
 		}
 
-		for(size_t i = 1; i < layerNum - 1; i++)
-			theta[i] = theta[i] - alpha * thetaGrad[i];
+		for(size_t j = 0; j < layerNum - 1; j++)
+			theta[j] = theta[j] - alpha * thetaGrad[j];
 	}
 	auto end = chrono::steady_clock::now();
 	auto elapsed = end - start;
@@ -392,9 +404,9 @@ Mat cvnn::vector2dToMat(vector<vector<double>> data)
 
 Mat cvnn::sigmoid(Mat data)
 {
-	data = -data;
-	exp(data, data);
-	return 1 / (1 + data);
+	Mat result;
+	exp(-data, result);
+	return 1 / (1 + result);
 }
 
 Mat cvnn::sigmoidGradient(Mat data)
