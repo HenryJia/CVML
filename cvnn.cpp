@@ -263,11 +263,6 @@ double cvnn::trainConcurrentFuncApprox()
 	}
 	upperRanges[threads - 1] = m;
 
-	double tem;
-	theta[0] = vector2dToMat(readCSV("InitialTheta1.csv", false, tem));
-	theta[1] = vector2dToMat(readCSV("InitialTheta2.csv", false, tem));
-	theta[2] = vector2dToMat(readCSV("InitialTheta3.csv", false, tem));
-
 	for(int i = 0; i < iters; i++)
 	{
 		for(size_t j = 0; j < threads; j++)
@@ -316,11 +311,6 @@ double cvnn::trainFuncApprox()
 	Mat Delta[layerNum - 1];
 
 	Mat thetaGrad[layerNum - 1];
-
-	double tem;
-	theta[0] = vector2dToMat(readCSV("InitialTheta1.csv", false, tem));
-	theta[1] = vector2dToMat(readCSV("InitialTheta2.csv", false, tem));
-	theta[2] = vector2dToMat(readCSV("InitialTheta3.csv", false, tem));
 
 	for(int i = 0; i < iters; i++)
 	{
