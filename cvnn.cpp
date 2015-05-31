@@ -305,6 +305,17 @@ double cvnn::trainFuncApprox()
 
 	J.clear();
 
+	Mat trans;
+	Mat product;
+
+	Mat z[layerNum - 1];
+	Mat a[layerNum - 1];
+
+	Mat delta[layerNum - 1];
+
+	Mat Delta[layerNum - 1];
+
+	Mat thetaGrad[layerNum - 1];
 
 	double tem;
 	theta[0] = vector2dToMat(readCSV("InitialTheta1.csv", false, tem));
@@ -314,18 +325,6 @@ double cvnn::trainFuncApprox()
 	for(int i = 0; i < iters; i++)
 	{
 
-		Mat trans;
-		Mat product;
-
-		Mat z[layerNum - 1];
-		Mat a[layerNum - 1];
-
-		Mat delta[layerNum - 1];
-
-		Mat Delta[layerNum - 1];
-
-		Mat thetaGrad[layerNum - 1];
-		cout << "theta " << layerNum - 2 << ": " << theta[layerNum - 2].row(0).col(0) << endl << endl;
 		z[0] = x * theta[0];
 		a[0] = sigmoid(z[0]);
 		for(size_t j = 1; j < layerNum - 2; j++)
@@ -341,19 +340,19 @@ double cvnn::trainFuncApprox()
 
 		//Calculate small delta
 		delta[layerNum - 2] = a[layerNum - 2] - y;
-		//Calculate cost
-		J.push_back(sum(delta[layerNum - 2].mul(delta[layerNum - 2]))[0] / (2 * m));
-		cout << "Iteration " << i << ": " << "Cost: " << J[i] << endl;
-		cout << "delta " << layerNum - 2 << ": " << delta[layerNum - 2].row(0).col(0) << endl << endl;
+
 		for(int j = layerNum - 3; j >= 0; j--)
 		{
 			transpose(theta[j + 1], trans);
 			product = delta[j + 1] * trans;
 			delta[j] = product.colRange(1, product.cols).mul(sigmoidGradient(z[j]));
-			cout << "delta " << j + 1 << ": " << delta[j + 1].row(0).col(0) << endl;
-			cout << "theta " << j + 1 << ": " << theta[j + 1].row(0).col(0) << endl;
-			cout << "product " << j << ": " << product.row(0).col(1) << endl;
+			//cout << "product " << j << ": " << product.row(0).col(1) << endl;
+			//cout << "delta " << j << ": " << delta[j].row(0).col(0) << endl;
 		}
+
+		//Calculate cost
+		J.push_back(sum(delta[layerNum - 2].mul(delta[layerNum - 2]))[0] / (2 * m));
+		cout << "Iteration " << i << ": " << "Cost: " << J[i] << endl;
 
 		transpose(delta[0], trans);
 		Delta[0] = trans * x;
